@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  probash_web_v2:
+    build: .
+    container_name: probash_today_news_backend-web
+    command: gunicorn probash_backend.wsgi:application --bind 0.0.0.0:8000 --workers 3
+    volumes:
+      - .:/app
+      - probash_v2_static_volume:/app/static
+      - probash_v2_media_volume:/app/media
+    ports:
+      - "8002:8000"
+    environment:
+      - DB_HOST=probash_db_v2
+      - DB_NAME=probash_v2_db
+      - DB_USER=postgres
+      - DB_PASS=postgres
+      - DJANGO_SETTINGS_MODULE=probash_backend.settings
+    depends_on:
+      - probash_db_v2
+
+  probash_db_v2:
+    image: postgres:15
+    container_name: probash_today_news_backend-db
+    volumes:
+      - probash_v2_postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=probash_v2_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+
+volumes:
+  probash_v2_postgres_data:
+  probash_v2_static_volume:
+  probash_v2_media_volume:
